@@ -1,290 +1,175 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV - Devi Febriyani</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Struktur node untuk playlist lagu
+struct Lagu {
+    string judul;
+    Lagu* next;
+};
+
+class Playlist {
+private:
+    Lagu* last; // pointer ke node terakhir
+
+public:
+    Playlist() {
+        last = NULL;
+    }
+
+    // Tambah Lagu
+    void tambahLagu(string judul) {
+        Lagu* newNode = new Lagu;
+        newNode->judul = judul;
+
+        if (last == NULL) {
+            newNode->next = newNode;
+            last = newNode;
+        } else {
+            newNode->next = last->next;
+            last->next = newNode;
+            last = newNode;
+        }
+    }
+
+    // Tampilkan Playlist
+    void tampilkanPlaylist() {
+        if (last == NULL) {
+            cout << "\nPlaylist kosong!\n";
+            return;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        cout << "\n=== DAFTAR PLAYLIST ===" << endl;
+        Lagu* current = last->next;
+        int no = 1;
+
+        do {
+            cout << no << ". " << current->judul << endl;
+            current = current->next;
+            no++;
+        } while (current != last->next);
+
+        cout << "=======================\n";
+    }
+
+    // Hapus Lagu Pertama
+    void hapusLaguPertama() {
+        if (last == NULL) {
+            cout << "Playlist kosong, tidak ada lagu yang dihapus!" << endl;
+            return;
         }
 
-        .cv-container {
-            background: white;
-            max-width: 800px;
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+        Lagu* first = last->next;
+
+        if (first == last) {
+            delete first;
+            last = NULL;
+        } else {
+            last->next = first->next;
+            delete first;
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
+        cout << "Lagu pertama berhasil dihapus!" << endl;
+    }
+
+    // Cari Lagu
+    void cariLagu(string judul) {
+        if (last == NULL) {
+            cout << "Playlist kosong!" << endl;
+            return;
         }
 
-        .profile-photo {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: white;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            color: #667eea;
-            border: 5px solid white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
+        Lagu* current = last->next;
+        int posisi = 1;
+        bool ditemukan = false;
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header .subtitle {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .section {
-            margin-bottom: 35px;
-        }
-
-        .section-title {
-            color: #667eea;
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title::before {
-            content: '';
-            width: 5px;
-            height: 25px;
-            background: #667eea;
-            border-radius: 3px;
-        }
-
-        .info-item {
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-            transition: transform 0.2s;
-        }
-
-        .info-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-value {
-            color: #666;
-            padding-left: 28px;
-        }
-
-        .hobbies-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .hobby-item {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-            transition: transform 0.2s;
-        }
-
-        .hobby-item:hover {
-            transform: translateY(-5px);
-        }
-
-        .hobby-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .education-timeline {
-            position: relative;
-            padding-left: 30px;
-        }
-
-        .education-timeline::before {
-            content: '';
-            position: absolute;
-            left: 8px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #667eea;
-        }
-
-        .education-item {
-            position: relative;
-            margin-bottom: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            transition: transform 0.2s;
-        }
-
-        .education-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .education-item::before {
-            content: '';
-            position: absolute;
-            left: -26px;
-            top: 25px;
-            width: 12px;
-            height: 12px;
-            background: #667eea;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 0 0 3px #667eea;
-        }
-
-        .education-school {
-            font-weight: 700;
-            color: #333;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
-
-        .education-level {
-            color: #667eea;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .education-year {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        footer {
-            background: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 2em;
+        do {
+            if (current->judul == judul) {
+                cout << "Lagu \"" << judul
+                     << "\" ditemukan pada posisi ke-"
+                     << posisi << endl;
+                ditemukan = true;
+                break;
             }
-            .content {
-                padding: 20px;
-            }
-            .hobbies-list {
-                grid-template-columns: 1fr;
-            }
+
+            current = current->next;
+            posisi++;
+
+        } while (current != last->next);
+
+        if (!ditemukan) {
+            cout << "Lagu \"" << judul
+                 << "\" tidak ditemukan dalam playlist." << endl;
         }
-    </style>
-</head>
-<body>
-    <div class="cv-container">
-        <div class="header">
-            <div class="profile-photo">👤</div>
-            <h1>Devi Febriyani</h1>
-            <p class="subtitle">Curriculum Vitae</p>
-        </div>
+    }
+};
 
-        <div class="content">
-            <div class="section">
-                <h2 class="section-title">Informasi Pribadi</h2>
-                <div class="info-item">
-                    <div class="info-label">📍 Alamat</div>
-                    <div class="info-value">Indonesia</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">📧 Email</div>
-                    <div class="info-value">devifebriyani@email.com</div>
-                </div>
-            </div>
+int main() {
+    Playlist playlist;
+    int pilihan;
+    string judulLagu;
 
-            <div class="section">
-                <h2 class="section-title">Hobi</h2>
-                <div class="hobbies-list">
-                    <div class="hobby-item">
-                        <div class="hobby-icon">🏸</div>
-                        <div>Badminton</div>
-                    </div>
-                    <div class="hobby-item">
-                        <div class="hobby-icon">📚</div>
-                        <div>Baca Novel</div>
-                    </div>
-                </div>
-            </div>
+    // Identitas Mahasiswa
+    cout << "======================================" << endl;
+    cout << " TUGAS CIRCULAR SINGLY LINKED LIST " << endl;
+    cout << "======================================" << endl;
+    cout << "Nama  : Devi Febriyani" << endl;
+    cout << "NIM   : 241091900205" << endl;
+    cout << "Kelas : 04SKMM002" << endl;
+    cout << "======================================" << endl;
 
-            <div class="section">
-                <h2 class="section-title">Riwayat Pendidikan</h2>
-                <div class="education-timeline">
-                    <div class="education-item">
-                        <div class="education-school">SDN Cerukcuk 2</div>
-                        <div class="education-level">Sekolah Dasar</div>
-                        <div class="education-year">SD Negeri</div>
-                    </div>
-                    <div class="education-item">
-                        <div class="education-school">SMPN 1 Tirtayasa</div>
-                        <div class="education-level">Sekolah Menengah Pertama</div>
-                        <div class="education-year">SMP Negeri</div>
-                    </div>
-                    <div class="education-item">
-                        <div class="education-school">SMAN 1 Tirtayasa</div>
-                        <div class="education-level">Sekolah Menengah Atas</div>
-                        <div class="education-year">SMA Negeri</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    // Data awal playlist
+    playlist.tambahLagu("Jealous");
+    playlist.tambahLagu("Bila Memang Kamu");
+    playlist.tambahLagu("My Heart");
+    playlist.tambahLagu("Impossible");
 
-        <footer>
-            <p>&copy; 2024 Devi Febriyani - Curriculum Vitae</p>
-        </footer>
-    </div>
-</body>
-</html>
+    do {
+        cout << "\n=== MENU CIRCULAR SINGLY LINKED LIST ===" << endl;
+        cout << "1. Tambah Lagu" << endl;
+        cout << "2. Tampilkan Playlist" << endl;
+        cout << "3. Hapus Lagu Pertama" << endl;
+        cout << "4. Cari Lagu" << endl;
+        cout << "5. Keluar" << endl;
+        cout << "Pilihan Anda : ";
+        cin >> pilihan;
+        cin.ignore();
+
+        switch (pilihan) {
+        case 1:
+            cout << "Masukkan judul lagu : ";
+            getline(cin, judulLagu);
+            playlist.tambahLagu(judulLagu);
+            cout << "Lagu berhasil ditambahkan!" << endl;
+            break;
+
+        case 2:
+            playlist.tampilkanPlaylist();
+            break;
+
+        case 3:
+            playlist.hapusLaguPertama();
+            break;
+
+        case 4:
+            cout << "Masukkan judul lagu yang dicari : ";
+            getline(cin, judulLagu);
+            playlist.cariLagu(judulLagu);
+            break;
+
+        case 5:
+            cout << "\nTerima kasih." << endl;
+            cout << "Program dibuat oleh:" << endl;
+            cout << "Devi Febriyani" << endl;
+            cout << "NIM : 241091900205" << endl;
+            cout << "Kelas : 04SKMM002" << endl;
+            break;
+
+        default:
+            cout << "Pilihan tidak valid!" << endl;
+        }
+
+    } while (pilihan != 5);
+
+    return 0;
+}
